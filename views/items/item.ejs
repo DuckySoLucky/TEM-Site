@@ -1,381 +1,499 @@
-
 <html>
 
-    <head>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+<head>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
 
-        <style>html{visibility: hidden;opacity:0;}</style>
+  <style>
+    html {
+      visibility: hidden;
+      opacity: 0;
+    }
+  </style>
+</head>
 
-    </head>
+<script></script>
 
-    <script>
+<body onload="getItemInfo();writeItem(),httpscheck()">
+  <div class="topbar">
+    <img src="https://i.imgur.com/UUFNpMd.png" class="TEM" style="width: 13rem" draggable="false" />
+    <form action="/" method="POST">
+      <input type="text" name="search" id="search" class="search" placeholder="Items And Players" value="<%=search%>" required />
+      <span class="material-icons">search</span>
+      <button type="submit" class="submit">Search</button>
+    </form>
+  </div>
 
-    </script>
+  <div class="main">
+    <div class="Item">
+      <h1 class="ititle" id="ititle">Item Information</h1>
+      <div class="itemdiscription">
+        <!-- Item Name -->
+        <div class="binfoFrame"></div>
 
-    <body onload="getItemInfo();writeItem(),httpscheck()">
-            <div class="topbar">
-                    <img src="https://i.imgur.com/UUFNpMd.png" class="TEM" style="width:13rem;" draggable="false">
-                    <form action="/" method="POST">
-                            <input type="text" name="search" id="search" class="search" placeholder="Items And Players" value="<%=search%>" required>
-                            <span class="material-icons">search</span>
-                        <button type="submit"  class="submit">Search</button>
-                    </form>
-                
-            </div>
-        
-            <div class="main">
-                <div class="Item">
-                    <h1 class="ititle" id="ititle">Item Discription</h1>
-                        <div class="itemdiscription">
-                            <div class="binfoFrame">
-                                    
-                            </div>
+        <!-- Item Icon -->
+        <div class="itemFrame"></div>
 
-                            <div class="itemFrame">
+        <!-- Item Information -->
+        <div class="itemInformation">
+          <div class="enchantmentsFrame">
+            <h2 class="enchantments-title">Enchantments</h2>
+            <div class="enchantments"></div>
+          </div>
 
+          <div class="itemDataFrame">
+            <h2 class="itemData-title">Other Information</h2>
+            <div class="itemData"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                            </div>
+    <div class="vline"></div>
 
-                        </div>
-                    <h1 class="etitle" id="etitle">Item Enchants</h1>
+    <div class="history" id="history">
+      <h1 class="historyTitle">Owner History</h1>
 
-                        <div class="enchantments" id="ebox">
+      <div class="bmargin"></div>
+    </div>
+  </div>
+</body>
 
-                        </div>
-                </div>
-
-                <div class="vline"></div>
-
-                <div class="history" id="history">
-
-                    <h1 class="historyTitle">Owner History</h1>
-
-                    
-                    <div class="bmargin"></div>
-                </div>
-
-            </div>
-
-                
-    </body>
 </html>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <script>
-    let stars = {"0":"","1":"✪","2":"✪✪","3":"✪✪✪","4":"✪✪✪✪","5":"✪✪✪✪✪","6":"✪✪✪✪✪➀","7":"✪✪✪✪✪➁","8":"✪✪✪✪✪➂","9":"✪✪✪✪✪➃","10":"✪✪✪✪✪➄"};
-    let itemrarity = {"common":"0","uncommon":"1","rare":"2","epic":"3","legendary":"4","mythic":"5","divine":"6","special":"7","very_special":"8"};
-    let raritycolor = {"0":"#FFFFFF","1":"#55FF55","2":"#5555FF","3":"#AA00AA","4":"#FFAA00","5":"#FF55FF","6":"#55FFFF","7":"#FF5555","8":"#FF5555"};
-    let maxenchantlvl = {"Bane of Arthropods":"7","Cleave":"6","Critical":"7"}
-    let itemData = null;
-    let itemProcessing = false;
+  let stars = {
+    0: "",
+    1: "✪",
+    2: "✪✪",
+    3: "✪✪✪",
+    4: "✪✪✪✪",
+    5: "✪✪✪✪✪",
+    6: "✪✪✪✪✪➀",
+    7: "✪✪✪✪✪➁",
+    8: "✪✪✪✪✪➂",
+    9: "✪✪✪✪✪➃",
+    10: "✪✪✪✪✪➄",
+  };
+  let itemrarity = {
+    common: "0",
+    uncommon: "1",
+    rare: "2",
+    epic: "3",
+    legendary: "4",
+    mythic: "5",
+    divine: "6",
+    special: "7",
+    very_special: "8",
+  };
+  let raritycolor = {
+    0: "#FFFFFF",
+    1: "#55FF55",
+    2: "#5555FF",
+    3: "#AA00AA",
+    4: "#FFAA00",
+    5: "#FF55FF",
+    6: "#55FFFF",
+    7: "#FF5555",
+    8: "#FF5555",
+  };
+  let maxenchantlvl = {
+    "Bane of Arthropods": "7",
+    Cleave: "6",
+    Critical: "7",
+  };
+  let itemData = null;
+  let itemProcessing = false;
 
-    async function httpscheck() {
-        // check for localhost
-        if(window.location.href.includes("localhost")){
-            return;
-        }
-        
-        else if (window.location.protocol != "https:")
-            window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+  async function httpscheck() {
+    // check for localhost
+    if (window.location.href.includes("localhost")) {
+      return;
+    } else if (window.location.protocol != "https:")
+      window.location.href =
+      "https:" +
+      window.location.href.substring(window.location.protocol.length);
+  }
+
+  let itemOptions = {
+    method: "GET",
+    url: "https://api.tem.cx/items/" + "<%=search%>",
+    headers: {
+      "Content-Type": "application/json"
+    },
+  };
+
+  async function getItem() {
+    let attempts = 0;
+    while (itemProcessing) {
+      if (attempts > 5) {
+        return {};
+      }
+      await new Promise((r) => setTimeout(r, 1000));
+      attempts++;
+    }
+    if (itemData == null) {
+      itemProcessing = true;
+      await axios.request(itemOptions).then(function(response) {
+        itemData = response.data;
+      });
+      itemProcessing = false;
+    }
+    return itemData;
+  }
+
+  async function getPlayerName(id) {
+    let playerName = "";
+    await axios
+      .get("https://mc-heads.net/minecraft/profile/" + id)
+      .then(function(response) {
+        playerName = response.data;
+      });
+    return playerName;
+  }
+
+  async function getItemInfo() {
+    const item = await getItem();
+    const itemInfo = item.item;
+    const itemName = itemInfo.itemId;
+    const enchantments = itemInfo.enchantments;
+
+    //item img
+
+    async function getItemRarity(rarity) {
+      const lowerrarity = rarity.toLowerCase();
+      let rarityvalue = itemrarity[lowerrarity];
+      if (itemInfo.extraAttributes.rarity_upgrades == "1") {
+        rarityvalue = parseInt(rarityvalue) + 1;
+      }
+      return rarityvalue;
     }
 
-    let itemOptions = {
-            method: 'GET',
-            url: 'https://api.tem.cx/items/' + '<%=search%>',
-            headers: {'Content-Type': 'application/json'}
+    let itemImg = document.createElement("img");
+    itemImg.src = "https://sky.shiiyu.moe/item/" + itemName;
+    itemImg.className = "itemImg";
+    document.getElementsByClassName("itemFrame")[0].appendChild(itemImg);
+
+    //item Name
+
+    let itemRarityNumber = await getItemRarity(itemInfo.rarity);
+    let itemDName = document.createElement("p");
+    itemDName.innerHTML = itemInfo.friendlyName;
+    itemDName.className = "itemDName";
+    itemDName.style.color = raritycolor[itemRarityNumber];
+    document.getElementsByClassName("binfoFrame")[0].appendChild(itemDName);
+
+    //Stars
+    if (itemInfo.extraAttributes.dungeon_item_level != undefined) {
+      let itemStars = document.createElement("p");
+      itemStars.innerHTML = stars[itemInfo.extraAttributes.dungeon_item_level];
+      itemStars.className = "itemStars";
+      document.getElementsByClassName("binfoFrame")[0].appendChild(itemStars);
     }
 
-    async function getItem() {
-        let attempts = 0;
-        while (itemProcessing) {
-            if (attempts > 5) {
-                return {}
-            }
-            await new Promise(r => setTimeout(r, 1000));
-            attempts++
-        }
-        if (itemData == null) {
-            itemProcessing = true;
-            await axios.request(itemOptions).then(function (response) {
-                itemData = response.data
-            })
-            itemProcessing = false;
-        }
-        return itemData
+    if (Object.keys(enchantments).length === 0) {
+      const ebox = document.getElementById("ebox");
+      const etitle = document.getElementById("etitle");
+      if (ebox) ebox.remove();
+      if (etitle) etitle.remove();
+      return;
     }
 
-    async function getPlayerName(id) {
-        let playerName = ''
-        await axios.get('https://mc-heads.net/minecraft/profile/' + id).then(function (response) {
-            playerName = response.data
-        })
-        return playerName
+    for (const enchantName in enchantments) {
+      let enchantment = document.createElement("p");
+      let enchantmentLevel = document.createElement("p");
+      enchantmentLevel.innerHTML = enchantments[enchantName];
+      enchantmentLevel.className = "enchantmentLevel";
+      enchantment.className = "enchantment";
+      let formattedEnchantName = enchantName
+        .split("_")
+        .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+        .join(" ");
+      enchantment.id = formattedEnchantName;
+      enchantment.innerHTML = formattedEnchantName + " ";
+      document
+        .getElementsByClassName("enchantments")[0]
+        .appendChild(enchantment);
+      document
+        .getElementById(formattedEnchantName)
+        .appendChild(enchantmentLevel);
     }
 
-    async function getItemInfo(){
-        const item = await getItem()
-        const itemInfo = item.item
-        const itemName = itemInfo.itemId
-        const enchantments = itemInfo.enchantments
-
-        //item img
-
-        async function getItemRarity(rarity){
-            const lowerrarity = rarity.toLowerCase();
-            let rarityvalue = itemrarity[lowerrarity]
-            if(itemInfo.extraAttributes.rarity_upgrades == '1'){
-                rarityvalue = parseInt(rarityvalue) + 1
-            }
-            return rarityvalue
-        }
-
-        let itemImg = document.createElement('img')
-        itemImg.src = 'https://sky.shiiyu.moe/item/' + itemName
-        itemImg.className = 'itemImg'
-        document.getElementsByClassName('itemFrame')[0].appendChild(itemImg)
-
-        //item Name
-
-        let itemRarityNumber = await getItemRarity(itemInfo.rarity)
-        let itemDName = document.createElement('p')
-        itemDName.innerHTML = itemInfo.friendlyName
-        itemDName.className = 'itemDName'
-        itemDName.style.color = raritycolor[itemRarityNumber]
-        document.getElementsByClassName('binfoFrame')[0].appendChild(itemDName)
-
-
-        //Stars
-
-        if(itemInfo.extraAttributes.dungeon_item_level != undefined){
-            let itemStars = document.createElement('p')
-            itemStars.innerHTML = stars[itemInfo.extraAttributes.dungeon_item_level]
-            itemStars.className = 'itemStars'
-            document.getElementsByClassName('binfoFrame')[0].appendChild(itemStars)
-        }
-
-
-
-        if(Object.keys(enchantments).length === 0){
-            const ebox = document.getElementById('ebox')
-            const etitle = document.getElementById('etitle')
-            ebox.remove()
-            etitle.remove()
-            return
-        }
-
-        for(const enchantName in enchantments){
-            let enchantment = document.createElement("p")
-            let enchantmentLevel = document.createElement("p")
-            enchantmentLevel.innerHTML = enchantments[enchantName]
-            enchantmentLevel.className = 'enchantmentLevel'
-            enchantment.className = 'enchantment'
-            let formattedEnchantName = enchantName.replace('_', ' ')
-            enchantment.id = formattedEnchantName
-            //i = i.replace('_', ' ')
-            enchantment.innerHTML = formattedEnchantName + ': '
-            document.getElementsByClassName('enchantments')[0].appendChild(enchantment)
-            document.getElementById(formattedEnchantName).appendChild(enchantmentLevel)
-        }
+    if (itemInfo.rarity) {
+      let itemRarity = document.createElement("p");
+      itemRarity.innerHTML = `Rarity: ${itemInfo.rarity}`;
+      itemRarity.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemRarity);
     }
 
-    async function writeItem(){
-        const item = await getItem()
-
-        ownerList = []
-        previousOwners = item.item.previousOwners
-
-
-        if(previousOwners.length === 0){
-                let startDateConvert = new Date(item.item.created_at)
-                let startDate = startDateConvert.getDate() + '/' + (startDateConvert.getMonth() + 1) + '/' + (startDateConvert.getFullYear())
-                let owneruuid = item.item.currentOwner.playerUuid
-                let playerName = await getPlayerName(owneruuid)
-
-                let img = document.createElement('img')
-                let pName = document.createElement('p')
-                let pStart = document.createElement('p')
-                let pEnd = document.createElement('p')
-                let div = document.createElement('div')
-                let href = document.createElement('a')
-
-                pStart.innerHTML = startDate + '<span class="material-icons-outlined">file_download</span>'
-                pEnd.innerHTML = 'Not Been Traded' + '<span class="material-icons-outlined">file_upload</span>'
-                pStart.id = 'start'
-                pEnd.id = 'end'
-                div.id = 'owner'
-                pName.innerHTML = playerName.name
-                href.href = 'https://sky.shiiyu.moe/stats/' + playerName.name
-                href.id = 'href'
-                img.src = 'https://mc-heads.net/avatar/' + owneruuid
-
-                document.getElementById('history').appendChild(div)
-                document.getElementById('owner').appendChild(href)
-                document.getElementById('href').appendChild(img);
-                document.getElementById('owner').appendChild(pName);
-                document.getElementById('owner').appendChild(pEnd);
-                document.getElementById('owner').appendChild(pStart);
-            
-                let bmargin = document.createElement('div')
-                bmargin.className = 'bmargin'
-                document.getElementById('history').appendChild(bmargin)  
-        }
-
-    
-        else{
-            let startDateConvert = new Date(item.item.created_at)
-            for(const ownerUuid in previousOwners){
-                let obj = {}
-                startDateConvert = new Date(previousOwners[ownerUuid].start)
-                let endDateConvert = new Date(previousOwners[ownerUuid].end)
-                obj.startDate = startDateConvert.getDate() + '/' + (startDateConvert.getMonth() + 1) + '/' + (startDateConvert.getFullYear())
-                obj.endDate = endDateConvert.getDate() + '/' + (endDateConvert.getMonth() + 1) + '/' + (endDateConvert.getFullYear())
-                obj.playerUuid = previousOwners[ownerUuid].owner.playerUuid
-                ownerList.push(obj)
-            }
-            let obj = {}
-            obj.startDate = startDateConvert.getDate() + '/' + (startDateConvert.getMonth() + 1) + '/' + (startDateConvert.getFullYear())
-            obj.endDate = 'Present'
-            obj.playerUuid = item.item.currentOwner.playerUuid
-            ownerList.push(obj)
-            ownerList.reverse()
-        }
-        
-
-        for(const ownerIndex in ownerList){
-            let playerName = await getPlayerName(ownerList[ownerIndex].playerUuid)
-            let img = document.createElement('img')
-            let pName = document.createElement('p')
-            pName.classList.add("formattedParagraph")
-            let pStart = document.createElement('p')
-            let pEnd = document.createElement('p')
-            let div = document.createElement('div')
-            let href = document.createElement('a')
-            let ownerId = "owner-" + ownerIndex
-            pStart.innerHTML = ownerList[ownerIndex].startDate + '<span class="material-icons-outlined">file_download</span>'
-            pEnd.innerHTML = ownerList[ownerIndex].endDate + '<span class="material-icons-outlined">file_upload</span>'
-            pStart.id = ownerId + '-start'
-            pStart.classList.add("startDate")
-            pEnd.id = ownerId + '-end'
-            pEnd.classList.add("endDate")
-            div.id = ownerId
-            pName.innerHTML = playerName.name
-            href.href = 'https://sky.shiiyu.moe/stats/' + playerName.name
-            href.id = 'href-' + ownerId
-            img.src = 'https://mc-heads.net/avatar/' + ownerList[ownerIndex].playerUuid
-            document.getElementById('history').appendChild(div)
-            document.getElementById(div.id).appendChild(href)
-            document.getElementById(href.id).appendChild(img);
-            document.getElementById(div.id).appendChild(pName);
-            document.getElementById(div.id).appendChild(pEnd);
-            document.getElementById(div.id).appendChild(pStart);
-        }
-        let bmargin = document.createElement('div')
-        bmargin.className = 'bmargin'
-        document.getElementById('history').appendChild(bmargin)  
-        
+    if (itemInfo.reforge) {
+      let itemReforge = document.createElement("p");
+      itemReforge.innerHTML = `Reforge: ${itemInfo.reforge.charAt(0).toUpperCase() + itemInfo.reforge.slice(1)}`;
+      itemReforge.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemReforge);
     }
 
+    if (itemInfo.colour) {
+      let itemColour = document.createElement("p");
+      itemColour.innerHTML = `Colour: ${itemInfo.colour}`;
+      itemColour.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemColour);
+    }
 
+    if (itemInfo.created_at) {
+      let itemCreated = document.createElement("p");
+      itemCreated.innerHTML = `Created: ${new Date(itemInfo.created_at).toLocaleDateString("en-US")}`;
+      itemCreated.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemCreated);
+    }
+
+    if (itemInfo.lastChecked) {
+      let itemLastChecked = document.createElement("p");
+      itemLastChecked.innerHTML = `Last Checked: ${new Date(itemInfo.lastChecked).toLocaleDateString("en-US")}`;
+      itemLastChecked.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemLastChecked);
+    }
+
+    if (itemInfo.extraAttributes?.edition) {
+      let itemEdition = document.createElement("p");
+      itemEdition.innerHTML = `Edition: ${itemInfo.extraAttributes.edition}`;
+      itemEdition.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemEdition);
+    }
+
+    if (itemInfo.extraAttributes?.sender_name) {
+      let itemSender = document.createElement("p");
+      itemSender.innerHTML = `Given by: ${itemInfo.extraAttributes.sender_name}`;
+      itemSender.className = "itemData";
+      document.getElementsByClassName("itemData")[0].appendChild(itemSender);
+    }
+
+  }
+
+  async function writeItem() {
+    const item = await getItem();
+
+    ownerList = [];
+    previousOwners = item.item.previousOwners;
+
+    if (previousOwners.length === 0) {
+      let startDateConvert = new Date(item.item.created_at);
+      let startDate =
+        startDateConvert.getDate() +
+        "/" +
+        (startDateConvert.getMonth() + 1) +
+        "/" +
+        startDateConvert.getFullYear();
+      let owneruuid = item.item.currentOwner.playerUuid;
+      let playerName = await getPlayerName(owneruuid);
+
+      let img = document.createElement("img");
+      let pName = document.createElement("p");
+      let pStart = document.createElement("p");
+      let pEnd = document.createElement("p");
+      let div = document.createElement("div");
+      let href = document.createElement("a");
+
+      pStart.innerHTML =
+        startDate +
+        '<span class="material-icons-outlined">file_download</span>';
+      pEnd.innerHTML =
+        "Not Been Traded" +
+        '<span class="material-icons-outlined">file_upload</span>';
+      pStart.id = "start";
+      pEnd.id = "end";
+      div.id = "owner";
+      pName.innerHTML = playerName.name;
+      href.href = "https://sky.shiiyu.moe/stats/" + playerName.name;
+      href.id = "href";
+      img.src = "https://mc-heads.net/avatar/" + owneruuid;
+
+      document.getElementById("history").appendChild(div);
+      document.getElementById("owner").appendChild(href);
+      document.getElementById("href").appendChild(img);
+      document.getElementById("owner").appendChild(pName);
+      document.getElementById("owner").appendChild(pEnd);
+      document.getElementById("owner").appendChild(pStart);
+
+      let bmargin = document.createElement("div");
+      bmargin.className = "bmargin";
+      document.getElementById("history").appendChild(bmargin);
+    } else {
+      let startDateConvert = new Date(item.item.created_at);
+      for (const ownerUuid in previousOwners) {
+        let obj = {};
+        startDateConvert = new Date(previousOwners[ownerUuid].start);
+        let endDateConvert = new Date(previousOwners[ownerUuid].end);
+        obj.startDate =
+          startDateConvert.getDate() +
+          "/" +
+          (startDateConvert.getMonth() + 1) +
+          "/" +
+          startDateConvert.getFullYear();
+        obj.endDate =
+          endDateConvert.getDate() +
+          "/" +
+          (endDateConvert.getMonth() + 1) +
+          "/" +
+          endDateConvert.getFullYear();
+        obj.playerUuid = previousOwners[ownerUuid].owner.playerUuid;
+        ownerList.push(obj);
+      }
+      let obj = {};
+      obj.startDate =
+        startDateConvert.getDate() +
+        "/" +
+        (startDateConvert.getMonth() + 1) +
+        "/" +
+        startDateConvert.getFullYear();
+      obj.endDate = "Present";
+      obj.playerUuid = item.item.currentOwner.playerUuid;
+      ownerList.push(obj);
+      ownerList.reverse();
+    }
+
+    for (const ownerIndex in ownerList) {
+      let playerName = await getPlayerName(ownerList[ownerIndex].playerUuid);
+      let img = document.createElement("img");
+      let pName = document.createElement("p");
+      pName.classList.add("formattedParagraph");
+      let pStart = document.createElement("p");
+      let pEnd = document.createElement("p");
+      let div = document.createElement("div");
+      let href = document.createElement("a");
+      let ownerId = "owner-" + ownerIndex;
+      pStart.innerHTML =
+        ownerList[ownerIndex].startDate +
+        '<span class="material-icons-outlined">file_download</span>';
+      pEnd.innerHTML =
+        ownerList[ownerIndex].endDate +
+        '<span class="material-icons-outlined">file_upload</span>';
+      pStart.id = ownerId + "-start";
+      pStart.classList.add("startDate");
+      pEnd.id = ownerId + "-end";
+      pEnd.classList.add("endDate");
+      div.id = ownerId;
+      pName.innerHTML = playerName.name;
+      href.href = "https://sky.shiiyu.moe/stats/" + playerName.name;
+      href.id = "href-" + ownerId;
+      img.src =
+        "https://mc-heads.net/avatar/" + ownerList[ownerIndex].playerUuid;
+      document.getElementById("history").appendChild(div);
+      document.getElementById(div.id).appendChild(href);
+      document.getElementById(href.id).appendChild(img);
+      document.getElementById(div.id).appendChild(pName);
+      document.getElementById(div.id).appendChild(pEnd);
+      document.getElementById(div.id).appendChild(pStart);
+    }
+    let bmargin = document.createElement("div");
+    bmargin.className = "bmargin";
+    document.getElementById("history").appendChild(bmargin);
+  }
 </script>
 
-
-
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@1,600&family=Montserrat&display=swap');
+  @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@1,600&family=Montserrat&display=swap");
 
+  * {
+    margin: 0;
+    padding: 0;
+    white-space: normal;
+    transition: all 0.2s ease-in-out;
+    overflow: hidden;
+  }
 
-
-* {
-  margin: 0;
-  padding: 0;
-  white-space: normal;
-  transition: all 0.2s ease-in-out;
-  overflow: hidden;
-}
-body{
+  body {
     background-color: #232931;
-    font-family: 'Montserrat', sans-serif;
-}
-/* Topbar */
-.topbar{
+    font-family: "Montserrat", sans-serif;
+  }
+
+  /* Topbar */
+  .topbar {
     background-color: #232931;
     height: 5rem;
     width: 100%;
     position: fixed;
-    box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;    
-}
+    box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
+      rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px,
+      rgba(0, 0, 0, 0.09) 0px 32px 16px;
+  }
 
-.Item{
+  .Item {
     position: absolute;
     width: 60%;
     height: 100%;
+  }
 
-}
-.tem{
+  .tem {
     position: fixed;
     padding-left: 2rem;
     top: -4rem;
-    -webkit-user-select: none;  /* Chrome all / Safari all */
-    -moz-user-select: none;     /* Firefox all */
-    -ms-user-select: none;      /* IE 10+ */
-    user-select: none; 
-}
-input{
+    -webkit-user-select: none;
+    /* Chrome all / Safari all */
+    -moz-user-select: none;
+    /* Firefox all */
+    -ms-user-select: none;
+    /* IE 10+ */
+    user-select: none;
+  }
+
+  input {
     position: relative;
     width: 30rem;
     height: 2.5rem;
     border-radius: 10px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
     font-size: 1rem;
-    color: #EEEEEE;
-    background-color: #393E46;
+    color: #eeeeee;
+    background-color: #393e46;
     outline: none;
     padding-left: 5vh;
     border: none;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
+  }
 
-input:hover , input:focus{
+  input:hover,
+  input:focus {
     transition: all 0.2s ease-in-out;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+      rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  }
 
-}
+  .topbar input::placeholder {
+    color: #eeeeee;
+  }
 
-.topbar input::placeholder{
-    color: #EEEEEE;
-}
-
-.search{
+  .search {
     position: absolute;
     right: 11rem;
     top: 1.3rem;
     padding: 1rem;
-}
+  }
 
-.topbar span{
+  .topbar span {
     float: right;
     margin-right: 12rem;
     margin-top: 1.6rem;
     position: relative;
     z-index: 2;
-    color: #EEEEEE;
+    color: #eeeeee;
     font-size: 2rem;
-}
+  }
 
-button {
+  button {
     top: 1.3rem;
     right: 1.5rem;
     position: absolute;
-    background-color: #393E46;
+    background-color: #393e46;
     border-radius: 5px;
     border-style: none;
     box-sizing: border-box;
-    color: #EEEEEE;
+    color: #eeeeee;
     cursor: pointer;
     display: inline-block;
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
     font-size: 1em;
     font-weight: 500;
     height: 2.5rem;
@@ -392,40 +510,38 @@ button {
     -webkit-user-select: none;
     touch-action: manipulation;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
-button:hover{
+  }
+
+  button:hover {
     transition: all 0.2s ease-in-out;
-    background-color: #4ECCA3;
+    background-color: #4ecca3;
     color: #232931;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-}
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+      rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  }
 
-/* Main */
+  /* Main */
 
-.main{
+  .main {
     position: absolute;
     top: 5rem;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    
-}
+  }
 
+  /* history */
 
-
-
-/* history */
-
-.history{
+  .history {
     position: absolute;
     width: 40%;
     height: 100%;
     right: 0;
     overflow-y: auto;
     overflow-x: disabled;
-}
+  }
 
-.history div:not(.vline,.bmargin){
+  .history div:not(.vline, .bmargin) {
     position: relative;
     display: inline-block;
     top: 0rem;
@@ -438,200 +554,218 @@ button:hover{
     margin-left: 2rem;
     margin-top: 5rem;
     border-radius: 10px;
-    background-color: #393E46;
+    background-color: #393e46;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     overflow-x: auto;
-}
+  }
 
-.history div:not(.vline,.bmargin):hover{
+  .history div:not(.vline, .bmargin):hover {
     transition: all 0.2s ease-in-out;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-}
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+      rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  }
 
-.history div img{
+  .history div img {
     width: 8rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
+  }
 
-}
-
-.history div .formattedParagraph {
+  .history div .formattedParagraph {
     width: auto;
     position: absolute;
     top: 2rem;
     left: 11rem;
     font-size: 2rem;
     font-weight: 750;
-    color: #4ECCA3;
-}
+    color: #4ecca3;
+  }
 
-.history div p {
+  .history div p {
     width: auto;
     top: 2rem;
-}
+  }
 
-.startDate {
+  .startDate {
     position: absolute;
     padding-top: 7.5vh;
     left: 32rem;
     font-size: 1.5rem;
     font-weight: 750;
-    color: #4ECCA3;
-}
-.endDate {
+    color: #4ecca3;
+  }
+
+  .endDate {
     position: absolute;
     padding-top: 0rem;
     left: 32rem;
     font-size: 1.5rem;
     font-weight: 750;
-    color: #4ECCA3;
-}
+    color: #4ecca3;
+  }
 
-.startDate span{
+  .startDate span {
     position: relative;
-    color: #EEEEEE;
+    color: #eeeeee;
     font-size: 2rem;
     top: 0.3rem;
     left: 0.2rem;
-}
+  }
 
-.endDate span{
+  .endDate span {
     position: relative;
-    color: #EEEEEE;
+    color: #eeeeee;
     font-size: 2rem;
     top: 0.3rem;
     left: 0.2rem;
-}
+  }
 
-
-.vline{
+  .vline {
     overflow-y: hidden;
     position: absolute;
     display: inline;
     width: 0.1rem;
     height: inherit;
-    background-color: #393E46;
+    background-color: #393e46;
     right: 40%;
     overflow-y: hidden;
-}
+  }
 
-.historytitle{
+  .historytitle {
     position: absolute;
     left: 17rem;
     top: 1rem;
     font-size: 2rem;
     font-weight: 1000;
-    color: #EEEEEE;
-}
+    color: #eeeeee;
+  }
 
-
-
-
-
-.bmargin{
+  .bmargin {
     position: absolute;
     height: 10rem;
     width: 100%;
     align-self: bottom;
-}
+  }
 
-/* items */
+  /* items */
 
-.itemdiscription{
+  .itemdiscription {
     position: absolute;
     top: 8.5vh;
     left: 1vw;
-    width:42vw;
+    width: 59vw;
     height: 82%;
     border-radius: 15px;
     overflow-y: auto;
     overflow-x: auto;
-    background-color: #393E46;
+    background-color: #393e46;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
+  }
 
-.itemdiscription:hover{
-    transition: all 0.2s ease-in-out;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-}
-
-.enchantments{
+  .itemInformation {
+    margin-top: 13rem;
+    padding: 1rem;
     position: absolute;
-    top: 8.5vh;
-    right: 1vw;
-    width:15vw;
-    height: 82%;
-    border-radius: 15px;
+    top: 2vh;
+    left: 2vh;
+    width: 94%;
+    height: 50vw;
+    background-color: #232931;
+    align-content: center;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    outline-width: 2px;
+    outline-style: solid;
+    outline-color: #4ecca3;
+    display: inline-block;
+    display: flex;
+    flex-direction: justify;
+  }
+
+  .enchantmentsFrame {
     overflow-y: auto;
     overflow-x: auto;
-    background-color: #393E46;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
+    background-color: #232931;
+    border-radius: 10px;
+    color: #eeeeee;
+    width: 25%;
+    height: 75%;
+  }
 
-.enchantments:hover{
-    transition: all 0.2s ease-in-out;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-}
+  .itemDataFrame {
+    display: inline-block;
+    overflow-y: auto;
+    overflow-x: auto;
+    background-color: #232931;
+    border-radius: 10px;
+    color: #eeeeee;
+    width: 25%;
+    height: 75%;
+  }
 
-.enchantment{
-    position: relative;
-    display: block;
-    text-align: right;
-    padding-right: 3rem;
+  .enchantments-title {
+    position: absolute;
+    font-size: 2rem;
+    font-weight: 1000;
+    color: #eeeeee;
     font-size: 1.5rem;
-    font-weight: 500;
-    color: #EEEEEE;
-    margin-top: 0.5rem;
-}
-.enchantmentLevel{
-    position: relative;
-    display: block;
-    bottom:0.2rem;
-    left: 1.5rem;
-    margin-top: -1.5rem;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #4ECCA3;
-}
+  }
 
-.etitle{
+  .enchantments {
+    position: absolute;
+    width: auto;
+    height: auto;
+    top: 3rem;
+    color: #eeeeee;
+  }
+
+  .enchantmentLevel {
+    position: relative;
+    display: inline-block;
+    bottom: -0.3rem;
+    color: #4ecca3;
+  }
+
+  .etitle {
     position: absolute;
     left: 45vw;
     top: 1vh;
     font-size: 2rem;
     font-weight: 1000;
-    color: #EEEEEE;
-}
-.ititle{
+    color: #eeeeee;
+  }
+
+  .ititle {
     position: absolute;
     left: 15vw;
     top: 1vh;
     font-size: 2rem;
     font-weight: 1000;
-    color: #EEEEEE;
-}
+    color: #eeeeee;
+  }
 
-.itemDname{
+  .itemDname {
     position: absolute;
     left: 1vw;
     top: 2vh;
     font-size: 2.5rem;
     font-weight: 1000;
-}
-.itemStars{
-    position: absolute;
-    left: 1.1vw;
-    top: 6.5vh;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #EEEEEE;
-}
+  }
 
-.binfoFrame{
+  .itemStars {
+    font-size: 2.5rem;
+    font-weight: 1000;
+    color: #ffffff;
+    position: absolute;
+    left: 1vw;
+    top: 7.5vh;
+  }
+
+  .binfoFrame {
     padding: 1rem;
     position: relative;
     top: 2vh;
     left: 11.5vw;
-    width: 66%;
+    width: 76%;
     height: 8vw;
     background-color: #232931;
     align-content: center;
@@ -639,16 +773,10 @@ button:hover{
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     outline-width: 2px;
     outline-style: solid;
-    outline-color: #4ECCA3;
-}
+    outline-color: #4ecca3;
+  }
 
-.binfoFrame:hover{
-    transition: all 0.2s ease-in-out;
-    outline-color: #4ecca200;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-}
-
-.itemframe{
+  .itemframe {
     padding: 1rem;
     position: absolute;
     top: 2vh;
@@ -661,17 +789,10 @@ button:hover{
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     outline-width: 2px;
     outline-style: solid;
-    outline-color: #4ECCA3;
-}
+    outline-color: #4ecca3;
+  }
 
-.itemframe:hover{
-    transition: all 0.2s ease-in-out;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-    outline-color: #4ecca200;
-
-}
-
-.itemImg{
+  .itemImg {
     width: inherit;
     height: inherit;
     margin: 0;
@@ -680,15 +801,15 @@ button:hover{
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-}
+  }
 
-/* Footer */
+  /* Footer */
 
-/* ===== Scrollbar CSS ===== */
+  /* ===== Scrollbar CSS ===== */
   /* Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #4ECCA3 #ffffff5c;
+    scrollbar-color: #4ecca3 #ffffff5c;
   }
 
   /* Chrome, Edge, and Safari */
@@ -701,15 +822,13 @@ button:hover{
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: #4ECCA3;
+    background-color: #4ecca3;
     border-radius: 18px;
     border: 4px solid #ffffff00;
   }
 
-
-html {
+  html {
     visibility: visible;
     opacity: 1;
-}
-
+  }
 </style>
